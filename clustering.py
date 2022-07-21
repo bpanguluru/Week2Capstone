@@ -122,49 +122,119 @@ def create_nodes(photos: List):
     nodes = np.empty()
     model = FacenetModel()
     descriptors = np.empty(N, dtype = np.ndarray)
+    adj = np.zeros((N, N))
+    
+    #creates descriptors for each image
     for i in range(N):
         photo = fn.load_image(photos[i])
         boxes, probabilities, landmarks = model.detect(photo)
         np.append(descriptors, model.compute_descriptors(photo, boxes))
+
+    #populates adjacency matrix
     for i in range(N):
         for j in range(N):
-            if i != j and fn.cos_distance(descriptors[i], descriptors[j])
-    
+            dist = fn.cos_distance(descriptors[i], descriptors[j])
+            if (i != j) and (dist < db.threshold):
+                adj[i,j] = 1/(dist**2)
+                adj[j,i] = 1/(dist**2)
+    for i in range (N):
+        node = Node(i, np.nonzero(adj[i]), descriptors[i])
+        nodes.append(node)
+    return (nodes, adj)        
 
-
-
-    
-    
-
-    adj = np.zeros((N, N))
-                
-    
-
-
- def connected_component(nodes: List):
-    for node_idx in len(nodes):
-        node_label = nodes[node]
-    
-
-
-def whispers(node_pairs):
-    """
-    Separates images into clusters based on detected individuals. 
+def connected_component(nodes: List):
+    '''
+    Finds all connected components in given graph based on label, and stores them in 2d list. 
 
     Parameters
     -----------
-    
-    
+    nodes : List
+        List of all nodes in graph. Should be taken from create_nodes() in test file. 
+
     Returns
+    ----------
+    labels : List
+        List of list of connected components based on label. 
+    '''
+    
+    labels = []
+    labels_covered = []
+
+    for node_idx in len(nodes):
+        node_label = nodes[node_idx]
+        label_matches = []
+        
+        if node_label not in labels_covered:
+            labels_covered.append(node_label)
+
+            for node2_idx in len(nodes):
+                if node2_idx != node_idx and nodes[node2_idx].label == nodes[node_idx].label:
+                    label_matches.append(nodes[node2_idx])
+
+            labels.append(label_matches)
+    
+    return labels
+    
+def propagate_label():
+    """
+    propagate_label(nd : Node, adjmatrix : np.ndarray):
+
+    Updates node labels based on the weights of neighbors
+
+    Parameters:
+
+    nodes : List
+        List of all nodes from the graph
+    
+    neighbors : 
+        List of weights (Bigger = closer) (? part of node class maybe)
+    
+    adjmatrix : 
+        N by N matrix 
+
+    Returns:
+        Nothing
+        Updates nd.label to be the neighbor with the greatest weightt
+ 
+    """
+    n = nd.id
+  
+
+    m = -1
+    resid = -1
+    for neighbor in nd.neighbors:
+        if(adjmatrix[n][neighbor] > m):
+            m = adjmatrix[n][neighbor]
+            resid = neighbor
+
+    nd.label = resid
+
+        
+
+def whispers(prop_times : int):
+    """
+    calls propagate_label on a random node with a given set of times
+
+    Parameters
     -----------
 
-graph[]    """
+    prop_times : int
+        Amount of times propagate_label is called
     
-    
-    dists = fn.cos_distance()
+    Returns : 
+        Nothing, updates the labels to the nearest neighbor / biggest weight of random nodes
 
-    for i in range(len(dists))::
-            
-        if dists[i] < threshold
-    
+    -----------
+        
 
+        """
+    #what var for number of nodes, curr N
+    
+    for i in range(prop_times):
+        select_node = np.random.randint(0, N)
+        propagate_label(select_node)
+    
+    
+    #for i in range(len(dists)):
+        #if dists[i] < db.threshold:
+            print("shut up python")
