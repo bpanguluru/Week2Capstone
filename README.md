@@ -1,7 +1,7 @@
 # Week2Capstone
 BWSI 2022 Week 2 Vision Capstone
 
-database.py
+database.py(Jayashabari, Josh, Jamie)
   - Take input from camera
   - locate faces in the image and extract their “descriptor vectors”
   - determine if there is a match for each face in the database
@@ -12,7 +12,7 @@ database.py
   - Dictionary to store name/profile pairs
   - determine cosine distance threshhold
 
-clustering.py
+clustering.py (Aaron, Katrine, Eric)
   - Create node class (https://rsokl.github.io/CogWeb/Video/Whispers.html#Useful-Code)
     - descriptor vector, file path, unique id, label, list of neighbor Ids
   - Adjacency matrix
@@ -24,6 +24,6 @@ clustering.py
     - return groups???
   - function that inputs stack of images and uses above classes/functions to return sorted images
 
-functions.py
+functions.py (Josh)
   - function to calculate cosine distance 
   - functions to load images as numpy arrays (https://rsokl.github.io/CogWeb/Video/FacialRecognition.html#Some-Useful-Code)
