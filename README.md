@@ -1,29 +1,110 @@
 # Week2Capstone
 BWSI 2022 Week 2 Vision Capstone
 
-database.py(Jayashabari, Josh, Jamie)
-  - Take input from camera
-  - locate faces in the image and extract their “descriptor vectors”
-  - determine if there is a match for each face in the database
-  - return the image with rectangles around the faces along with the corresponding name (or “Unknown” if there is no match)
-  - Profile class
-    - functions to add/remove profiles
-    - Name, list of descriptor vectors
-  - Dictionary to store name/profile pairs
-  - determine cosine distance threshhold
+We're no strangers to love
 
-clustering.py (Aaron, Katrine, Eric)
-  - Create node class (https://rsokl.github.io/CogWeb/Video/Whispers.html#Useful-Code)
-    - descriptor vector, file path, unique id, label, list of neighbor Ids
-  - Adjacency matrix
-  - whipsers algorithm function
-    - calculate cosine distances between pairs of nodes
-    - Create edge between nodes if distance is under calculated threshhold 
-    - randomly select and edge and update its label based off of its neighbors
-      - repeat a certain number of times
-    - return groups???
-  - function that inputs stack of images and uses above classes/functions to return sorted images
+You know the rules and so do I (do I)
 
-functions.py (Josh)
-  - function to calculate cosine distance 
-  - functions to load images as numpy arrays (https://rsokl.github.io/CogWeb/Video/FacialRecognition.html#Some-Useful-Code)
+A full commitment's what I'm thinking of
+
+You wouldn't get this from any other guy
+
+I just wanna tell you how I'm feeling
+
+Gotta make you understand
+
+Never gonna give you up
+
+Never gonna let you down
+
+Never gonna run around and desert you
+
+Never gonna make you cry
+
+Never gonna say goodbye
+
+Never gonna tell a lie and hurt you
+
+We've known each other for so long
+
+Your heart's been aching, but you're too shy to say it (say it)
+
+Inside, we both know what's been going on (going on)
+
+We know the game and we're gonna play it
+
+And if you ask me how I'm feeling
+
+Don't tell me you're too blind to see
+
+Never gonna give you up
+
+Never gonna let you down
+
+Never gonna run around and desert you
+
+Never gonna make you cry
+
+Never gonna say goodbye
+
+Never gonna tell a lie and hurt you
+
+Never gonna give you up
+
+Never gonna let you down
+
+Never gonna run around and desert you
+
+Never gonna make you cry
+
+Never gonna say goodbye
+
+Never gonna tell a lie and hurt you
+
+We've known each other for so long
+
+Your heart's been aching, but you're too shy to say it (to say it)
+
+Inside, we both know what's been going on (going on)
+
+We know the game and we're gonna play it
+
+I just wanna tell you how I'm feeling
+
+Gotta make you understand
+
+Never gonna give you up
+
+Never gonna let you down
+
+Never gonna run around and desert you
+
+Never gonna make you cry
+
+Never gonna say goodbye
+
+Never gonna tell a lie and hurt you
+
+Never gonna give you up
+
+Never gonna let you down
+
+Never gonna run around and desert you
+
+Never gonna make you cry
+
+Never gonna say goodbye
+
+Never gonna tell a lie and hurt you
+
+Never gonna give you up
+
+Never gonna let you down
+
+Never gonna run around and desert you
+
+Never gonna make you cry
+
+Never gonna say goodbye
+
+Never gonna tell a lie and hurt you
