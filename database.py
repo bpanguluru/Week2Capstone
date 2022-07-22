@@ -8,6 +8,7 @@ import pickle
 import functions
 from collections import defaultdict
 
+
 model = FacenetModel()
 database = defaultdict(None)
 threshhold = 0.6 #change later
