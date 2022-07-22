@@ -1,6 +1,7 @@
 import skimage.io as io
 import numpy as np
 
+
 def load_image(path_to_image : str):
 
     """
