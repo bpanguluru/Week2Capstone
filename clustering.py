@@ -52,6 +52,9 @@ class Node:
 
         self.truth = truth
         self.file_path = file_path
+    def __repr__(self):
+        return str(self.id)
+
 
 def plot_graph(graph, adj):
     
@@ -136,7 +139,6 @@ def create_nodes(photos: List):
         boxes, probabilities, landmarks = model.detect(photo)
 
         if len(boxes) == 1:
-            
             for descriptor in model.compute_descriptors(photo, boxes):
                 descriptors.append(descriptor)
         
@@ -153,7 +155,7 @@ def create_nodes(photos: List):
                 adj[j,i] = 1/dist**2
 
     for i in range (len(descriptors)):
-        node = Node(ID=i, neighbors=np.nonzero(adj[i]), descriptor=descriptors[i]) # keyword assignment
+        node = Node(ID=i, neighbors=np.nonzero(adj[i])[0], descriptor=descriptors[i]) # keyword assignment
         nodes.append(node)
     
     return (tuple(nodes), adj, cosine_dist)
@@ -183,16 +185,18 @@ def connected_components(nodes: List):
         
         if node_label not in labels_covered:
             labels_covered.append(node_label)
-
+            print("node label" + str(node_label))
             for node2_idx in range(len(nodes)):
-                if node2_idx != node_idx and nodes[node2_idx].label == nodes[node_idx].label:
+                print("nodes[node2_idx].label" + str(nodes[node2_idx].label))
+                if nodes[node2_idx].label == nodes[node_idx].label:
+                    print("hit")
                     label_matches.append(nodes[node2_idx])
 
             labels.append(label_matches)
     
     return labels
     
-def propagate_label(nd : Node, adjmatrix : np.ndarray):
+def propagate_label(nd : Node, adjmatrix : np.ndarray, nodes: List):
     """
     propagate_label(nd : Node, adjmatrix : np.ndarray):
 
@@ -222,7 +226,7 @@ def propagate_label(nd : Node, adjmatrix : np.ndarray):
     sums = np.zeros(adjmatrix.shape[0])
     
     for neighbor in nd.neighbors:
-        sums[neighbor.label] += adjmatrix[n, neighbor.id] # <- this is weight of edge between n and neighbor
+        sums[nodes[neighbor].label] += adjmatrix[n, nodes[neighbor].id] # <- this is weight of edge between n and neighbor
         
     '''
     for weight in sums:
@@ -235,7 +239,7 @@ def propagate_label(nd : Node, adjmatrix : np.ndarray):
     
         
 
-def whispers(prop_times : int, nodes: List, print_cc=False):
+def whispers(prop_times : int, nodes: List, adjmatrix : np.ndarray, print_cc=False):
     """
     calls propagate_label on a random node with a given set of times
 
@@ -260,7 +264,7 @@ def whispers(prop_times : int, nodes: List, print_cc=False):
 
     for i in range(prop_times):
         select_node = nodes[np.random.randint(N)]
-        propagate_label(select_node)
+        propagate_label(select_node, adjmatrix, nodes)
         
         if print_cc:
             print(connected_components(nodes))
