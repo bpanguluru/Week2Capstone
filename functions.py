@@ -35,17 +35,18 @@ def cos_distance(desc1 : np.ndarray, desc2 : np.ndarray):
     Parameters:
     ----------------------------------------------------------------
     desc1: 
-        The path to the image as a string
+        Numpy arrays of descriptors
 
     desc2: 
-        The path to the image as a string
+        Numpy arrays of descriptors to be compared to
     ----------------------------------------------------------------
     Returns:
-        cos_dist: the cosine distance between the two input vectors
+        cos_dist: 
+            Numpy array contianing the cosine distance between the two input vectors
 
     """
 
-    dot_prod = np.dot(desc1, desc2)
+    dot_prod = np.sum(desc1 * desc2)
     magnitude = np.linalg.norm(desc1)*np.linalg.norm(desc2)
     cos_dist = 1 - dot_prod / magnitude
 

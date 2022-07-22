@@ -1,3 +1,4 @@
+from os import listdir
 from importlib_metadata import List
 import networkx as nx
 import numpy as np
@@ -119,30 +120,46 @@ def create_nodes(photos: List):
         Corresponding adjacency matrix for the nodes
     '''
     N = len(photos)
-    nodes = np.empty()
+    nodes = []
     model = FacenetModel()
-    descriptors = np.empty(N, dtype = np.ndarray)
+    descriptors = []
     adj = np.zeros((N, N))
+    cosine_dist = []
     
     #creates descriptors for each image
+
+    # TODO: write conditional check; if length of boxes != 1, then photo has 1+ face + skip it
+    #       N = # of faces detected, not photos --> for adjacency matrix
     for i in range(N):
+    
         photo = fn.load_image(photos[i])
         boxes, probabilities, landmarks = model.detect(photo)
-        np.append(descriptors, model.compute_descriptors(photo, boxes))
 
+        if len(boxes) == 1:
+            
+            for descriptor in model.compute_descriptors(photo, boxes):
+                descriptors.append(descriptor)
+        
+    # descriptors is a shape (N, 512) numpy array
+    descriptors = np.array(descriptors)
+    
     #populates adjacency matrix
-    for i in range(N):
-        for j in range(N):
+    for i in range(len(descriptors)):
+        for j in range(len(descriptors)):
             dist = fn.cos_distance(descriptors[i], descriptors[j])
-            if (i != j) and (dist < db.threshold):
-                adj[i,j] = 1/(dist**2)
-                adj[j,i] = 1/(dist**2)
-    for i in range (N):
-        node = Node(i, np.nonzero(adj[i]), descriptors[i])
-        nodes.append(node)
-    return (nodes, adj)        
+            cosine_dist.append(dist)
+            if ((i != j) and (dist <= db.threshhold)):
+                adj[i,j] = 1/dist**2
+                adj[j,i] = 1/dist**2
 
-def connected_component(nodes: List):
+    for i in range (len(descriptors)):
+        node = Node(ID=i, neighbors=np.nonzero(adj[i]), descriptor=descriptors[i]) # keyword assignment
+        nodes.append(node)
+    
+    return (tuple(nodes), adj, cosine_dist)
+
+
+def connected_components(nodes: List):
     '''
     Finds all connected components in given graph based on label, and stores them in 2d list. 
 
@@ -160,14 +177,14 @@ def connected_component(nodes: List):
     labels = []
     labels_covered = []
 
-    for node_idx in len(nodes):
-        node_label = nodes[node_idx]
+    for node_idx in range(len(nodes)):
+        node_label = nodes[node_idx].label
         label_matches = []
         
         if node_label not in labels_covered:
             labels_covered.append(node_label)
 
-            for node2_idx in len(nodes):
+            for node2_idx in range(len(nodes)):
                 if node2_idx != node_idx and nodes[node2_idx].label == nodes[node_idx].label:
                     label_matches.append(nodes[node2_idx])
 
@@ -175,7 +192,7 @@ def connected_component(nodes: List):
     
     return labels
     
-def propagate_label():
+def propagate_label(nd : Node, adjmatrix : np.ndarray):
     """
     propagate_label(nd : Node, adjmatrix : np.ndarray):
 
@@ -183,12 +200,9 @@ def propagate_label():
 
     Parameters:
 
-    nodes : List
-        List of all nodes from the graph
-    
-    neighbors : 
-        List of weights (Bigger = closer) (? part of node class maybe)
-    
+    nd : Node
+        Singular Node to be updated
+
     adjmatrix : 
         N by N matrix 
 
@@ -198,20 +212,30 @@ def propagate_label():
  
     """
     n = nd.id
-  
 
     m = -1
     resid = -1
+
+    # TODO: neighbor labels need to be tallied up based on adjmatrix weights and then the most significant sum selected 
+    #       instead of simply taking the largest label 
+
+    sums = np.zeros(adjmatrix.shape[0])
+    
     for neighbor in nd.neighbors:
+        sums[neighbor.label] += adjmatrix[n, neighbor.id] # <- this is weight of edge between n and neighbor
+        
+    '''
+    for weight in sums:
         if(adjmatrix[n][neighbor] > m):
             m = adjmatrix[n][neighbor]
             resid = neighbor
-
-    nd.label = resid
-
+    '''
+    
+    nd.label = np.argmax(sums)
+    
         
 
-def whispers(prop_times : int):
+def whispers(prop_times : int, nodes: List, print_cc=False):
     """
     calls propagate_label on a random node with a given set of times
 
@@ -221,6 +245,9 @@ def whispers(prop_times : int):
     prop_times : int
         Amount of times propagate_label is called
     
+    nodes: list
+        list of nodes to perform the whispers algorithnm on
+    
     Returns : 
         Nothing, updates the labels to the nearest neighbor / biggest weight of random nodes
 
@@ -229,12 +256,16 @@ def whispers(prop_times : int):
 
         """
     #what var for number of nodes, curr N
-    
+    N = len(nodes)
+
     for i in range(prop_times):
-        select_node = np.random.randint(0, N)
+        select_node = nodes[np.random.randint(N)]
         propagate_label(select_node)
+        
+        if print_cc:
+            print(connected_components(nodes))
     
     
     #for i in range(len(dists)):
         #if dists[i] < db.threshold:
-            print("shut up python")
+            
