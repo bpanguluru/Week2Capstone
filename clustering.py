@@ -140,7 +140,7 @@ def create_nodes(photos: List):
 
         if len(boxes) == 1:
             for descriptor in model.compute_descriptors(photo, boxes):
-                descriptors.append(descriptor)
+                descriptors.append((descriptor, photos[i]))
         
     # descriptors is a shape (N, 512) numpy array
     descriptors = np.array(descriptors)
@@ -148,14 +148,14 @@ def create_nodes(photos: List):
     #populates adjacency matrix
     for i in range(len(descriptors)):
         for j in range(len(descriptors)):
-            dist = fn.cos_distance(descriptors[i], descriptors[j])
+            dist = fn.cos_distance(descriptors[i, 0], descriptors[j, 0])
             cosine_dist.append(dist)
             if ((i != j) and (dist <= db.threshhold)):
                 adj[i,j] = 1/dist**2
                 adj[j,i] = 1/dist**2
 
     for i in range (len(descriptors)):
-        node = Node(ID=i, neighbors=np.nonzero(adj[i])[0], descriptor=descriptors[i]) # keyword assignment
+        node = Node(ID=i, neighbors=np.nonzero(adj[i])[0], descriptor=descriptors[i, 0], file_path = descriptors[i, 1]) # keyword assignment
         nodes.append(node)
     
     return (tuple(nodes), adj, cosine_dist)
@@ -273,3 +273,13 @@ def whispers(prop_times : int, nodes: List, adjmatrix : np.ndarray, print_cc=Fal
     #for i in range(len(dists)):
         #if dists[i] < db.threshold:
             
+def display_sorted(labels: np.ndarray):
+    labels = np.array(labels)
+    longest = max([len(labels[i]) for i in range(len(labels))])
+    fig, axs = plt.subplots(longest, len(labels))
+    for j in range(len(labels)):
+        for i in range(len(labels[j])):
+        
+            #axs[i, j].imshow(functions.load_image(nodes[labels[i][j]].file_path))
+
+            axs[i, j].imshow(fn.load_image(labels[j][i].file_path))
